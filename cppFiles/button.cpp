@@ -1,6 +1,5 @@
 #include "../hFiles/button.h"
 
-
 static Texture2D scaleTexture(const char *path, float scale){
     Image image = LoadImage(path);
 

@@ -64,6 +64,15 @@ int main(void){
     Button quit2Button("Buttons/normalQuit.png", "Buttons/hoverQuit.png", "Buttons/clickedQuit.png", {340,280}, 0.15);
     SetTargetFPS(60);
 
+    InitAudioDevice();
+    Sound countDownSound = LoadSound("audio/timer.mp3");
+    Sound buttonSound = LoadSound("audio/buttonClick.mp3");
+    Sound hundredSound = LoadSound("audio/hundred.mp3");
+    Sound gameOverSound = LoadSound("audio/gameOver.mp3");
+    Sound scene1Sound = LoadSound("audio/scene1.mp3");
+    int lastHundred = 0;
+    bool gameOverSoundPlayed = false;
+
 
 //MAIN GAME WINDOW--------------------------------------------------------------------------------------------------------------------------
     while(!WindowShouldClose()){
@@ -81,14 +90,18 @@ int main(void){
             startButton.Update();
             quit1Button.Update();
             if(startButton.isClicked()){
+                PlaySound(buttonSound);
+                PlaySound(scene1Sound);
                 initGame(&ply,p,birds,screenWidth,&speed,&gaps,&score);
                 scoreTimer = 0.0f;
                 score = 0;
+                lastHundred = 0;
                 gameOver = false;
                 countdown = 3.0f;
                 currentScreen = Scene1;
             }
             else if(quit1Button.isClicked()){
+                PlaySound(buttonSound);
                 CloseWindow();
             }
         }
@@ -98,8 +111,10 @@ int main(void){
             }
         }
         else if(currentScreen == Scene2){
+            StopSound(scene1Sound);
             if(IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                 currentScreen = Timer;
+                PlaySound(countDownSound);
             }
         }
         else if(currentScreen == Timer){
@@ -121,6 +136,12 @@ int main(void){
                 }
                 scoreTimer += GetFrameTime();
                 score = (int)(scoreTimer*10);
+
+                if(score == lastHundred + 100){
+                    lastHundred += 100;
+                    PlaySound(hundredSound);
+                }
+
                 platformUpdate(&speed,p,birds,gaps,&score);
                 updateBirds(birds, speed);
                 playerUpdate(&ply);
@@ -136,13 +157,21 @@ int main(void){
                     hiScore = score;
                     SaveHighScore(hiScore);
                 }
-                
+
+                if(gameOver && !gameOverSoundPlayed){
+                    PlaySound(gameOverSound);
+                    gameOverSoundPlayed = true;
+                }
+
                 if(IsKeyPressed(KEY_ENTER)){
+                    StopSound(gameOverSound);
                     initGame(&ply,p,birds,screenWidth,&speed,&gaps,&score);
                     scoreTimer = 0.0f;
                     score = 0;
+                    lastHundred = 0;
                     countdown = 3.0f;
                     gameOver = false;
+                    gameOverSoundPlayed = false;
                 }
             }
         }
@@ -157,12 +186,15 @@ int main(void){
             quit2Button.Update();
 
             if(resumeButton.isClicked()){
+                PlaySound(buttonSound);
                 currentScreen = Gameplay;
             }
             else if(homeButton.isClicked()){
+                PlaySound(buttonSound);
                 currentScreen = Title;
             }
             else if(quit2Button.isClicked()){
+                PlaySound(buttonSound);
                 CloseWindow();
             }
         }
@@ -215,8 +247,6 @@ int main(void){
                 }
 
                 if(currentScreen == Pause){
-                    DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.5f));
-                    DrawRectangle(260,100,280,250,BLACK);
                     DrawText("PAUSED", screenWidth/2 - MeasureText("PAUSED", 30)/2, 115, 30, WHITE);
                     resumeButton.Draw();
                     homeButton.Draw();
@@ -237,6 +267,12 @@ UnloadTexture(scene2);
 UnloadTexture(timer1);
 UnloadTexture(timer2);
 UnloadTexture(timer3);
+UnloadSound(countDownSound);
+UnloadSound(buttonSound);
+UnloadSound(hundredSound);
+UnloadSound(gameOverSound);
+UnloadSound(scene1Sound);
+CloseAudioDevice();
 
 CloseWindow();
 return 0;

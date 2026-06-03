@@ -38,6 +38,7 @@ void platformUpdate(float *speed, platform p[], bird birds[], float gaps, int *s
 }
 
 
+
 jumpMetrics getJumpMetrics(float speed, float verticalDelta){
     jumpMetrics metrics;
     float upwardSpeed = -JUMP_VELOCITY;
@@ -59,6 +60,7 @@ jumpMetrics getJumpMetrics(float speed, float verticalDelta){
     metrics.minPlatformLength = PLAYER_STAND_WIDTH + std::max(112.0f, speed * 25.0f);
     return metrics;
 }
+
 
 void generatePlatformAfter(platform *platformToPlace, float previousRight, float previousY, float speed, int score, bird birds[]){
     float difficulty = std::min(1.0f, score / 900.0f);
@@ -88,6 +90,7 @@ void generatePlatformAfter(platform *platformToPlace, float previousRight, float
 
 
 
+
 void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafeGap, float speed, int score, bird birds[]){
     float leadSpace = std::max(112.0f, speed * 14.0f);
     float recoverySpace = std::max(50.0f, speed * 7.0f);
@@ -102,11 +105,17 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
     bool extraLongPlatform = plat->size.x >= extraLongPlatformLength;
     bool obstacleBeat = ((score / 80) % 3) != 1;
     int activeBirds = 0;
+    static bool lastSpawnWasBird = false;
 
     for(int i=0; i<MAX_BIRDS; i++){
         if(birds[i].active){
             activeBirds++;
         }
+    }
+
+    if(lastSpawnWasBird){
+        lastSpawnWasBird = false;
+        return;
     }
 
     if(activeBirds >= 2){
@@ -133,6 +142,8 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
         birds[i].active = true;
         birds[i].height = BirdHigh;
         birds[i].size = {birdWidth, birdHeightPx};
+        birds[i].active = true;
+        lastSpawnWasBird = true;
 
         float spawnMin = plat->position.x + leadSpace;
         float spawnMax = plat->position.x + plat->size.x - recoverySpace - birdWidth;
