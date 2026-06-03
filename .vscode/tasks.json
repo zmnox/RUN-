@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build & run raylib",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-c",
+        "g++ main.cpp -o app $(pkg-config --cflags --libs raylib) && ./app"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
