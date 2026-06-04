@@ -50,6 +50,7 @@ int main(void){
     Texture2D timer1 = LoadTexture("visuals/Timer1.png");
     Texture2D timer2 = LoadTexture("visuals/Timer2.png");
     Texture2D timer3 = LoadTexture("visuals/Timer3.png");
+    Texture2D L = LoadTexture("visuals/L.png");
 
     Rectangle recFrame = {0,0,(float)dino.width/8,(float)dino.height};
     int currentFrame = 0;
@@ -70,12 +71,17 @@ int main(void){
     Sound hundredSound = LoadSound("audio/hundred.mp3");
     Sound gameOverSound = LoadSound("audio/gameOver.mp3");
     Sound scene1Sound = LoadSound("audio/scene1.mp3");
+    Sound scene2Sound = LoadSound("audio/scene2.mp3");
+    Sound runSound = LoadSound("audio/RUN.mp3");
+    Music bgMusic = LoadMusicStream("audio/bg.mp3");
+    SetSoundVolume(countDownSound, 0.3f);
     int lastHundred = 0;
     bool gameOverSoundPlayed = false;
 
 
 //MAIN GAME WINDOW--------------------------------------------------------------------------------------------------------------------------
     while(!WindowShouldClose()){
+        UpdateMusicStream(bgMusic);
         frameTime += GetFrameTime();
         if(frameTime >= frameSpeed){
             frameTime = 0.0f;
@@ -107,12 +113,14 @@ int main(void){
         }
         else if(currentScreen == Scene1){
             if(IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                PlaySound(scene2Sound);
                 currentScreen = Scene2;
             }
         }
         else if(currentScreen == Scene2){
             StopSound(scene1Sound);
             if(IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                StopSound(scene2Sound);
                 currentScreen = Timer;
                 PlaySound(countDownSound);
             }
@@ -120,6 +128,8 @@ int main(void){
         else if(currentScreen == Timer){
             countdown -= GetFrameTime();
             if (countdown <0.0f){
+                PlaySound(runSound);
+                PlayMusicStream(bgMusic);
                 currentScreen = Gameplay;
             }
         }
@@ -149,6 +159,7 @@ int main(void){
                 checkGameOver(&ply, birds, screenHeight, &gameOver);
 
                 if(IsKeyPressed(KEY_P)){
+                    PauseMusicStream(bgMusic);
                     currentScreen = Pause;
                 }
             }
@@ -159,6 +170,7 @@ int main(void){
                 }
 
                 if(gameOver && !gameOverSoundPlayed){
+                    StopMusicStream(bgMusic);
                     PlaySound(gameOverSound);
                     gameOverSoundPlayed = true;
                 }
@@ -172,12 +184,17 @@ int main(void){
                     countdown = 3.0f;
                     gameOver = false;
                     gameOverSoundPlayed = false;
+                    SeekMusicStream(bgMusic, 0.0f);
+                    PlayMusicStream(bgMusic);
+                    currentScreen = Gameplay;
                 }
             }
         }
         else if(currentScreen == Pause){
             
             if(IsKeyPressed(KEY_P)){
+                StopSound(runSound);
+                ResumeMusicStream(bgMusic);
                 currentScreen = Gameplay;
             }
 
@@ -187,14 +204,20 @@ int main(void){
 
             if(resumeButton.isClicked()){
                 PlaySound(buttonSound);
+                ResumeMusicStream(bgMusic);
+                StopSound(runSound);
                 currentScreen = Gameplay;
             }
             else if(homeButton.isClicked()){
                 PlaySound(buttonSound);
+                StopSound(runSound);
+                StopMusicStream(bgMusic);
                 currentScreen = Title;
             }
             else if(quit2Button.isClicked()){
                 PlaySound(buttonSound);
+                StopSound(runSound);
+                StopMusicStream(bgMusic);
                 CloseWindow();
             }
         }
@@ -243,7 +266,10 @@ int main(void){
                 }
                 else{
                         DrawRectangle(0,0,screenWidth,screenHeight,BLACK);
-                        DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN",20)/2, GetScreenHeight()/2 - 20, 20, GRAY);
+                        Rectangle source = {0, 0, (float)L.width, (float)L.height};
+                        Rectangle dest = {screenWidth - 110, 10, 100, 100};
+                        DrawTexturePro(L, source, dest, {0, 0}, 0.0f, WHITE);
+                        DrawText("PRESS [ENTER] TO PLAY AGAIN", GetScreenWidth()/2 - MeasureText("PRESS [ENTER] TO PLAY AGAIN",20)/2, GetScreenHeight()/2 - 20, 20, WHITE);
                 }
 
                 if(currentScreen == Pause){
@@ -272,6 +298,9 @@ UnloadSound(buttonSound);
 UnloadSound(hundredSound);
 UnloadSound(gameOverSound);
 UnloadSound(scene1Sound);
+UnloadSound(scene2Sound);
+UnloadSound(runSound);
+UnloadMusicStream(bgMusic);
 CloseAudioDevice();
 
 CloseWindow();

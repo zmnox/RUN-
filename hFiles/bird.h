@@ -2,7 +2,7 @@
 
 #include <raylib.h>
 
-#define MAX_BIRDS 5
+#define MAX_BIRDS 2
 
 typedef enum{
     BirdLow,

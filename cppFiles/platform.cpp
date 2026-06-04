@@ -52,11 +52,9 @@ jumpMetrics getJumpMetrics(float speed, float verticalDelta){
     metrics.airtimeFrames = (upwardSpeed + sqrtf(discriminant)) / GRAVITY_ACCEL;
     metrics.platformTravel = speed * metrics.airtimeFrames;
 
-    // Use a conservative slice of the theoretical travel so slightly late jumps can still land.
     metrics.maxGap = std::max(126.0f, (metrics.platformTravel * 0.86f) - PLAYER_STAND_WIDTH - 12.0f);
     metrics.minGap = std::min(metrics.maxGap - 12.0f, std::max(90.0f, metrics.maxGap * 0.62f));
 
-    // As speed rises, a longer platform gives the fixed dinosaur a real landing and recovery window.
     metrics.minPlatformLength = PLAYER_STAND_WIDTH + std::max(112.0f, speed * 25.0f);
     return metrics;
 }
@@ -101,24 +99,11 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
     float safeBirdLength = leadSpace + recoverySpace + birdWidth;
     float longPlatformLength = safeBirdLength + 24.0f;
     float extraLongPlatformLength = safeBirdLength + 100.0f;
-    bool longPlatform = plat->size.x >= longPlatformLength;
-    bool extraLongPlatform = plat->size.x >= extraLongPlatformLength;
-    bool obstacleBeat = ((score / 80) % 3) != 1;
-    int activeBirds = 0;
     static bool lastSpawnWasBird = false;
 
-    for(int i=0; i<MAX_BIRDS; i++){
-        if(birds[i].active){
-            activeBirds++;
-        }
-    }
 
     if(lastSpawnWasBird){
         lastSpawnWasBird = false;
-        return;
-    }
-
-    if(activeBirds >= 2){
         return;
     }
 
@@ -126,11 +111,11 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
         return;
     }
 
-    if(!longPlatform){
+    if(plat->size.x < longPlatformLength){
         return;
     }
 
-    if(!extraLongPlatform && !obstacleBeat){
+    if(plat->size.x < extraLongPlatformLength ){
         return;
     }
 
@@ -139,7 +124,6 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
             continue;
         }
 
-        birds[i].active = true;
         birds[i].height = BirdHigh;
         birds[i].size = {birdWidth, birdHeightPx};
         birds[i].active = true;
