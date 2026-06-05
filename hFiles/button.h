@@ -22,3 +22,4 @@ class Button{
         Rectangle bounds;
         bool clicked;
 };
+

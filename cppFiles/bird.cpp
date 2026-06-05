@@ -5,7 +5,6 @@ void clearBirds(bird birds[]){
         birds[i].active = false;
         birds[i].position = {-200.0f, -200.0f};
         birds[i].size = {140.0f, 94.0f};
-        birds[i].height = BirdHigh;
     }
 }
 

@@ -124,7 +124,6 @@ void trySpawnBirdOnPlatform(const platform *plat, float gapBefore, float maxSafe
             continue;
         }
 
-        birds[i].height = BirdHigh;
         birds[i].size = {birdWidth, birdHeightPx};
         birds[i].active = true;
         lastSpawnWasBird = true;

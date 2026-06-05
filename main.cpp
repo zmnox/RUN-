@@ -73,6 +73,7 @@ int main(void){
     Sound scene1Sound = LoadSound("audio/scene1.mp3");
     Sound scene2Sound = LoadSound("audio/scene2.mp3");
     Sound runSound = LoadSound("audio/RUN.mp3");
+    Sound tiredSound = LoadSound("audio/tired.mp3");
     Music bgMusic = LoadMusicStream("audio/bg.mp3");
     SetSoundVolume(countDownSound, 0.3f);
     int lastHundred = 0;
@@ -98,6 +99,7 @@ int main(void){
             if(startButton.isClicked()){
                 PlaySound(buttonSound);
                 PlaySound(scene1Sound);
+                PlaySound(tiredSound);
                 initGame(&ply,p,birds,screenWidth,&speed,&gaps,&score);
                 scoreTimer = 0.0f;
                 score = 0;
@@ -118,6 +120,7 @@ int main(void){
             }
         }
         else if(currentScreen == Scene2){
+            StopSound(tiredSound);
             StopSound(scene1Sound);
             if(IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
                 StopSound(scene2Sound);
@@ -300,6 +303,7 @@ UnloadSound(gameOverSound);
 UnloadSound(scene1Sound);
 UnloadSound(scene2Sound);
 UnloadSound(runSound);
+UnloadSound(tiredSound);
 UnloadMusicStream(bgMusic);
 CloseAudioDevice();
 
