@@ -6,7 +6,10 @@ typedef enum{
     Scene2,
     Timer,
     Gameplay,
-    Pause
+    Pause,
+    Credits,
+    Controls,
+    Links
 }gameScreen;
 
 

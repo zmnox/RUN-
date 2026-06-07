@@ -51,6 +51,9 @@ int main(void){
     Texture2D timer2 = LoadTexture("visuals/Timer2.png");
     Texture2D timer3 = LoadTexture("visuals/Timer3.png");
     Texture2D L = LoadTexture("visuals/L.png");
+    Texture2D controls = LoadTexture("visuals/controls.png");
+    Texture2D links = LoadTexture("visuals/links.png");
+    Texture2D credits = LoadTexture("visuals/credits.png");
 
     Rectangle recFrame = {0,0,(float)dino.width/8,(float)dino.height};
     int currentFrame = 0;
@@ -58,11 +61,19 @@ int main(void){
     float frameSpeed = 0.1f;
     gameScreen currentScreen = Title;
 
-    Button startButton("Buttons/normalPlay.png", "Buttons/hoverPlay.png", "Buttons/clickedPlay.png", {100,250}, 0.15);
-    Button quit1Button("Buttons/normalQuit.png", "Buttons/hoverQuit.png", "Buttons/clickedQuit.png", {100,320}, 0.15);
+    //home
+    Button startButton("Buttons/normalPlay.png", "Buttons/hoverPlay.png", "Buttons/clickedPlay.png", {100,200}, 0.15);
+    Button controlsButton("Buttons/normalControls.png", "Buttons/hoverControls.png", "Buttons/clickedControls.png", {100,260}, 0.15);
+    Button creditsButton("Buttons/normalCredits.png", "Buttons/hoverCredits.png", "Buttons/clickedCredits.png", {100,320}, 0.15);
+    Button quit1Button("Buttons/normalQuit.png", "Buttons/hoverQuit.png", "Buttons/clickedQuit.png", {100,380}, 0.15);
+    Button linksButton("Buttons/normalLink.png", "Buttons/hoverLink.png", "Buttons/clickedLink.png", {680,390}, 0.15);
+    Button backButton("Buttons/normalBack.png", "Buttons/hoverBack.png", "Buttons/clickedBack.png", {10,390}, 0.15);
+ 
+    //pause
     Button resumeButton("Buttons/normalResume.png", "Buttons/hoverResume.png", "Buttons/clickedResume.png", {340,160}, 0.15);
     Button homeButton("Buttons/normalHome.png", "Buttons/hoverHome.png", "Buttons/clickedHome.png", {340,220}, 0.15);
     Button quit2Button("Buttons/normalQuit.png", "Buttons/hoverQuit.png", "Buttons/clickedQuit.png", {340,280}, 0.15);
+
     SetTargetFPS(60);
 
     InitAudioDevice();
@@ -95,6 +106,8 @@ int main(void){
     
         if(currentScreen == Title){
             startButton.Update();
+            controlsButton.Update();
+            creditsButton.Update();
             quit1Button.Update();
             if(startButton.isClicked()){
                 PlaySound(buttonSound);
@@ -108,9 +121,44 @@ int main(void){
                 countdown = 3.0f;
                 currentScreen = Scene1;
             }
+            else if(controlsButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Controls;
+            }
+            else if(creditsButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Credits;
+            }
             else if(quit1Button.isClicked()){
                 PlaySound(buttonSound);
                 CloseWindow();
+            }
+        }
+        else if(currentScreen == Controls){
+            backButton.Update();
+            if(backButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Title;
+            }
+        }
+        else if(currentScreen == Credits){
+            backButton.Update();
+            linksButton.Update();
+            if(backButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Title;
+            }
+            
+            if(linksButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Links;
+            }
+        }
+        else if(currentScreen == Links){
+            backButton.Update();
+            if(backButton.isClicked()){
+                PlaySound(buttonSound);
+                currentScreen = Credits;
             }
         }
         else if(currentScreen == Scene1){
@@ -233,7 +281,25 @@ int main(void){
             case Title:{
                 DrawTexture(title,0,0,WHITE); 
                 startButton.Draw();
+                controlsButton.Draw();
+                creditsButton.Draw();
                 quit1Button.Draw();
+            } break;
+
+            case Controls:{
+                DrawTexture(controls,0,0,WHITE);
+                backButton.Draw();
+            } break;
+
+            case Credits:{
+                DrawTexturePro(credits, {0,0,(float)credits.width,(float)credits.height}, {0,-30,screenWidth,530}, {0,0}, 0.0f, WHITE);
+                backButton.Draw();
+                linksButton.Draw();
+            } break;
+
+            case Links:{
+                DrawTexturePro(links, {0,0,(float)links.width,(float)links.height}, {0,-30,screenWidth,530}, {0,0}, 0.0f, WHITE);
+                backButton.Draw();
             } break;
 
             case Scene1:{
